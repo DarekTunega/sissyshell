@@ -45,27 +45,30 @@ void	wait_for_all_children(pid_t *pids, int n_child)
 		g_exit = final_status_code;
 }
 
-void	execute_child_in_pipeline(t_data *s_data, int c_idx,
-		t_pipe_data *pipe_data)
-{
-	ft_setup_child_signals();
-	if (pipe_data->pipe_fd_read != STDIN_FILENO)
-	{
-		if (dup2(pipe_data->pipe_fd_read, STDIN_FILENO) == -1)
-			ms_handle_system_error("dup2 stdin in child");
-		close(pipe_data->pipe_fd_read);
-	}
-	if (!pipe_data->is_last_cmd)
-	{
+static void setup_child_output(t_data *s_data, t_pipe_data *pipe_data) {
+	if (s_data->outfile != -1) {
+		dup2(s_data->outfile, STDOUT_FILENO);
+		close(s_data->outfile);
+		if (!pipe_data->is_last_cmd)
+			close(pipe_data->pipe_fds[1]);
+		close(pipe_data->pipe_fds[0]);
+	} else if (!pipe_data->is_last_cmd) {
 		close(pipe_data->pipe_fds[0]);
 		if (dup2(pipe_data->pipe_fds[1], STDOUT_FILENO) == -1)
 			ms_handle_system_error("dup2 stdout to pipe in child");
 		close(pipe_data->pipe_fds[1]);
 	}
-	else
-	{
-		set_outfile(s_data);
+}
+
+void execute_child_in_pipeline(t_data *s_data, int c_idx, t_pipe_data *pipe_data)
+{
+	ft_setup_child_signals();
+	if (pipe_data->pipe_fd_read != STDIN_FILENO) {
+		if (dup2(pipe_data->pipe_fd_read, STDIN_FILENO) == -1)
+			ms_handle_system_error("dup2 stdin in child");
+		close(pipe_data->pipe_fd_read);
 	}
+	setup_child_output(s_data, pipe_data);
 	ms_execute_single_command(s_data->commands[c_idx], c_idx, s_data);
 	exit(EXIT_FAILURE);
 }
