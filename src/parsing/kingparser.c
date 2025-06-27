@@ -14,13 +14,16 @@
 
 void	ft_parser(const char *user_input, t_data *shell_data)
 {
-	char	**token_array;
+    char **token_array;
+    char *processed_input;
 
-	token_array = ft_split(prepare_quoted_string(user_input), 29);
-	token_array = replace_env_var_nonquated(token_array);
-	token_array = parse_quated_strings(token_array);
-	token_array = status_var_check(token_array);
-	lexer(token_array, shell_data);
+    processed_input = prepare_quoted_string(user_input);
+    token_array = ft_split(processed_input, 29);
+    free(processed_input);
+    token_array = replace_env_var_nonquated(token_array);
+    token_array = parse_quated_strings(token_array);
+    token_array = status_var_check(token_array);
+    lexer(token_array, shell_data);
 }
 
 bool	check_consecutive_redirs(char **token_array)
