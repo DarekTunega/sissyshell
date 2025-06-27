@@ -42,14 +42,34 @@ char	*remove_quotes_from_word(char *word)
 	return (result);
 }
 
+void	handle_escape_in_quotes(char *word, char *result, int *i, int *j)
+{
+	if (word[*i + 1] == '$')
+	{
+		result[(*j)++] = '$';
+		(*i) += 2;
+	}
+	else if (word[*i + 1] == '\\')
+	{
+		result[(*j)++] = '\\';
+		(*i) += 2;
+	}
+	else
+		result[(*j)++] = word[(*i)++];
+}
+
 void	copy_quoted_content(char *word, char *result, int *i, int *j)
 {
-	char	quote_char;
+	char	quote_char = word[*i];
 
-	quote_char = word[*i];
 	(*i)++;
 	while (word[*i] && word[*i] != quote_char)
-		result[(*j)++] = word[(*i)++];
+	{
+		if (quote_char == '"' && word[*i] == '\\')
+			handle_escape_in_quotes(word, result, i, j);
+		else
+			result[(*j)++] = word[(*i)++];
+	}
 	if (word[*i] == quote_char)
 		(*i)++;
 }

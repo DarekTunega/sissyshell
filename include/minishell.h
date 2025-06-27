@@ -111,6 +111,8 @@ void		handle_single_redir(const char *input, char *result, int *i,
 				int *j);
 void		process_character_in_redirection(const char *input, char *result,
 				int *i, int *j);
+int			handle_variable_expansion(char *word, char *result, int i, int j);
+void		handle_escape_in_quotes(char *word, char *result, int *i, int *j);
 
 char		**replace_env_var_nonquated(char **words);
 char		*env_replacement(char *word, int i, int j);

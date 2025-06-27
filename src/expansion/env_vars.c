@@ -33,29 +33,47 @@ char	*env_replacement(char *word, int i, int j)
 	return (updated_str);
 }
 
+int	handle_variable_expansion(char *word, char *result, int i, int j)
+{
+	int		k = 0;
+	char	*var;
+	char	*env_v;
+
+	while (ft_isalnum(word[i + 1 + k]) || word[i + 1 + k] == '_')
+		k++;
+	if (k == 0)
+		return (0);
+	var = ft_substr(word, i + 1, k);
+	env_v = getenv(var);
+	free(var);
+	if (env_v)
+		while (*env_v)
+			result[j++] = *env_v++;
+	return (k + 1);
+}
+
 char	*dollar_check(char *word)
 {
-	int		i;
-	int		j;
+	int		len = ft_strlen(word);
+	char	*result = malloc(len + 1);
+	int		i = 0, j = 0, skip;
 
-	i = 0;
-	j = 0;
-	while (word[i] != '\0')
+	while (word[i])
 	{
-		if (word[i] == '$')
+		if (word[i] == '\\' && word[i + 1] == '$')
 		{
-			while (ft_isalnum(word[i + 1 + j]) || word[i + 1 + j] == '_')
-				j++;
-			if (j != 0)
-			{
-				word = env_replacement(word, i, j);
-				i = -1;
-				j = 0;
-			}
+			result[j++] = '\\';
+			result[j++] = '$';
+			i += 2;
 		}
-		i ++;
+		else if (word[i] == '$' && (skip = handle_variable_expansion(word, result, i, j)))
+			i += skip;
+		else
+			result[j++] = word[i++];
 	}
-	return (word);
+	result[j] = '\0';
+	free(word);
+	return (result);
 }
 
 char	**replace_env_var_nonquated(char **words)
