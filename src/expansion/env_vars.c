@@ -33,59 +33,76 @@ char	*env_replacement(char *word, int i, int j)
 	return (updated_str);
 }
 
-int	handle_variable_expansion(char *word, char *result, int i, int j)
+static char	*process_dollar_expansion(char *word, int *i, int *j)
 {
-	int		k = 0;
-	char	*var;
-	char	*env_v;
-
-	while (ft_isalnum(word[i + 1 + k]) || word[i + 1 + k] == '_')
-		k++;
-	if (k == 0)
-		return (0);
-	var = ft_substr(word, i + 1, k);
-	env_v = getenv(var);
-	free(var);
-	if (env_v)
-		while (*env_v)
-			result[j++] = *env_v++;
-	return (k + 1);
+	while (ft_isalnum(word[*i + 1 + *j]) || word[*i + 1 + *j] == '_')
+		(*j)++;
+	if (*j != 0)
+	{
+		word = env_replacement(word, *i, *j);
+		*i = -1;
+		*j = 0;
+		return (word);
+	}
+	return (word);
 }
 
 char	*dollar_check(char *word)
 {
-	int		len = ft_strlen(word);
-	char	*result = malloc(len + 1);
-	int		i = 0, j = 0, skip;
+	int		i;
+	int		j;
+	bool	in_single_quotes;
 
-	while (word[i])
+	i = 0;
+	j = 0;
+	in_single_quotes = false;
+	while (word[i] != '\0')
 	{
-		if (word[i] == '\\' && word[i + 1] == '$')
+		if (word[i] == '\'' && (i == 0 || word[i - 1] != '\\'))
+			in_single_quotes = !in_single_quotes;
+		else if (word[i] == '$' && !in_single_quotes && (i == 0 || word[i - 1] != '\\'))
 		{
-			result[j++] = '\\';
-			result[j++] = '$';
-			i += 2;
+			word = process_dollar_expansion(word, &i, &j);
+			if (i == -1)
+				in_single_quotes = false;
 		}
-		else if (word[i] == '$' && (skip = handle_variable_expansion(word, result, i, j)))
-			i += skip;
-		else
-			result[j++] = word[i++];
+		i++;
 	}
-	result[j] = '\0';
-	free(word);
-	return (result);
+	return (word);
+}
+
+static bool	should_expand_variables(char *word)
+{
+	int		i;
+	bool	in_single_quotes;
+	bool	has_expandable_content;
+
+	i = 0;
+	in_single_quotes = false;
+	has_expandable_content = false;
+	while (word[i] != '\0')
+	{
+		if (word[i] == '\'' && (i == 0 || word[i - 1] != '\\'))
+		{
+			in_single_quotes = !in_single_quotes;
+		}
+		else if (word[i] == '$' && !in_single_quotes && (i == 0 || word[i - 1] != '\\'))
+		{
+			has_expandable_content = true;
+		}
+		i++;
+	}
+	return (has_expandable_content);
 }
 
 char	**replace_env_var_nonquated(char **words)
 {
 	int	i;
-	int	len;
 
 	i = 0;
 	while (words[i] != NULL)
 	{
-		len = ft_strlen(words[i]);
-		if (!(words[i][0] == '\'' && words[i][len - 1] == '\''))
+		if (should_expand_variables(words[i]))
 			words[i] = dollar_check(words[i]);
 		i++;
 	}
