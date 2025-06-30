@@ -45,10 +45,10 @@ void	wait_for_all_children(pid_t *pids, int n_child)
 		g_exit = final_status_code;
 }
 
-static void	handle_child_output(t_data *s_data, t_pipe_data *pipe_data)
+static void	handle_child_output(t_data *s_data, t_pipe_data *pipe_data, int c_idx)
 {
 	close(pipe_data->pipe_fds[0]);
-	if (s_data->outfile != -1)
+	if (s_data->outfile != -1 && c_idx == 0)
 	{
 		set_outfile(s_data);
 	}
@@ -64,6 +64,8 @@ void	execute_child_in_pipeline(t_data *s_data, int c_idx,
 		t_pipe_data *pipe_data)
 {
 	ft_setup_child_signals();
+	if (c_idx == 0)
+		set_infile(s_data);
 	if (pipe_data->pipe_fd_read != STDIN_FILENO)
 	{
 		if (dup2(pipe_data->pipe_fd_read, STDIN_FILENO) == -1)
@@ -71,9 +73,12 @@ void	execute_child_in_pipeline(t_data *s_data, int c_idx,
 		close(pipe_data->pipe_fd_read);
 	}
 	if (!pipe_data->is_last_cmd)
-		handle_child_output(s_data, pipe_data);
+		handle_child_output(s_data, pipe_data, c_idx);
 	else
-		set_outfile(s_data);
+	{
+		if (c_idx == 0 || s_data->last_command == 0)
+			set_outfile(s_data);
+	}
 	ms_execute_single_command(s_data->commands[c_idx], c_idx, s_data);
 	exit(EXIT_FAILURE);
 }

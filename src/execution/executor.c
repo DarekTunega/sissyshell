@@ -68,7 +68,6 @@ static void	execute_pipeline(t_data *shell_data)
 	state.prev_fd_read = STDIN_FILENO;
 	state.shell_data = shell_data;
 	save_restore_std(shell_data, 0);
-	set_infile(shell_data);
 	process_pipeline_commands(&state);
 	wait_for_all_children(state.pids, state.num_children);
 	save_restore_std(shell_data, 1);
