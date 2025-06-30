@@ -60,7 +60,8 @@ char	*dollar_check(char *word)
 	{
 		if (word[i] == '\'' && (i == 0 || word[i - 1] != '\\'))
 			in_single_quotes = !in_single_quotes;
-		else if (word[i] == '$' && !in_single_quotes && (i == 0 || word[i - 1] != '\\'))
+		else if (word[i] == '$' && !in_single_quotes
+			&& (i == 0 || word[i - 1] != '\\'))
 		{
 			word = process_dollar_expansion(word, &i, &j);
 			if (i == -1)
@@ -86,7 +87,8 @@ static bool	should_expand_variables(char *word)
 		{
 			in_single_quotes = !in_single_quotes;
 		}
-		else if (word[i] == '$' && !in_single_quotes && (i == 0 || word[i - 1] != '\\'))
+		else if (word[i] == '$' && !in_single_quotes
+			&& (i == 0 || word[i - 1] != '\\'))
 		{
 			has_expandable_content = true;
 		}
@@ -105,22 +107,6 @@ char	**replace_env_var_nonquated(char **words)
 		if (should_expand_variables(words[i]))
 			words[i] = dollar_check(words[i]);
 		i++;
-	}
-	return (words);
-}
-
-char	**status_var_check(char **words)
-{
-	int	i;
-
-	i = 0;
-	while (words[i] != NULL)
-	{
-		if (ft_strchr(words[i], '$'))
-			words[i] = status_replace(words[i]);
-		else if (ft_strchr(words[i], '~'))
-			words[i] = tilda_replace(words[i]);
-		i ++;
 	}
 	return (words);
 }

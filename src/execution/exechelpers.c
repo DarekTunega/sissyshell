@@ -45,7 +45,8 @@ void	wait_for_all_children(pid_t *pids, int n_child)
 		g_exit = final_status_code;
 }
 
-static void	handle_child_output(t_data *s_data, t_pipe_data *pipe_data, int c_idx)
+static void	handle_child_output(t_data *s_data, t_pipe_data *pipe_data,
+		int c_idx)
 {
 	close(pipe_data->pipe_fds[0]);
 	if (s_data->outfile != -1 && c_idx == 0)
@@ -92,24 +93,5 @@ void	manage_parent_pipes_for_next_iteration(int *p_fd_r_io,
 	{
 		close(cur_pipe_fds[1]);
 		*p_fd_r_io = cur_pipe_fds[0];
-	}
-}
-
-void	setup_pipe_and_fork(t_executor_state *s)
-{
-	if (!s->is_last_cmd)
-	{
-		if (pipe(s->pipe_fds) == -1)
-			ms_handle_system_error("pipe in executor loop");
-	}
-	s->pids[s->num_children] = fork();
-	if (s->pids[s->num_children] == -1)
-	{
-		if (!s->is_last_cmd)
-		{
-			close(s->pipe_fds[0]);
-			close(s->pipe_fds[1]);
-		}
-		ms_handle_system_error("fork in executor loop");
 	}
 }

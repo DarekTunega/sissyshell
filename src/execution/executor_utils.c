@@ -55,3 +55,28 @@ void	save_restore_std(t_data *data, int i)
 		close(data->saved_stdout);
 	}
 }
+
+static void	ms_handle_system_error(const char *msg)
+{
+	perror(msg);
+	exit(1);
+}
+
+void	setup_pipe_and_fork(t_executor_state *s)
+{
+	if (!s->is_last_cmd)
+	{
+		if (pipe(s->pipe_fds) == -1)
+			ms_handle_system_error("pipe in executor loop");
+	}
+	s->pids[s->num_children] = fork();
+	if (s->pids[s->num_children] == -1)
+	{
+		if (!s->is_last_cmd)
+		{
+			close(s->pipe_fds[0]);
+			close(s->pipe_fds[1]);
+		}
+		ms_handle_system_error("fork in executor loop");
+	}
+}

@@ -79,3 +79,19 @@ char	*tilda_replace(char *word)
 	}
 	return (word);
 }
+
+char	**status_var_check(char **words)
+{
+	int	i;
+
+	i = 0;
+	while (words[i] != NULL)
+	{
+		if (ft_strchr(words[i], '$'))
+			words[i] = status_replace(words[i]);
+		else if (ft_strchr(words[i], '~'))
+			words[i] = tilda_replace(words[i]);
+		i ++;
+	}
+	return (words);
+}
