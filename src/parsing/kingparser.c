@@ -6,7 +6,7 @@
 /*   By: dtunega <dtunega@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/22 02:29:00 by skvackov          #+#    #+#             */
-/*   Updated: 2025/06/03 23:39:31 by dtunega          ###   ########.fr       */
+/*   Updated: 2025/07/01 15:00:10 by dtunega          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,16 +14,16 @@
 
 void	ft_parser(const char *user_input, t_data *shell_data)
 {
-    char **token_array;
-    char *processed_input;
+	char	**token_array;
+	char	*processed_input;
 
-    processed_input = prepare_quoted_string(user_input);
-    token_array = ft_split(processed_input, 29);
-    free(processed_input);
-    token_array = replace_env_var_nonquated(token_array);
-    token_array = parse_quated_strings(token_array);
-    token_array = status_var_check(token_array);
-    lexer(token_array, shell_data);
+	processed_input = prepare_quoted_string(user_input);
+	token_array = ft_split(processed_input, 29);
+	free(processed_input);
+	token_array = replace_env_var_nonquated(token_array);
+	token_array = parse_quated_strings(token_array);
+	token_array = status_var_check(token_array);
+	lexer(token_array, shell_data);
 }
 
 bool	check_consecutive_redirs(char **token_array)
@@ -37,8 +37,7 @@ bool	check_consecutive_redirs(char **token_array)
 		{
 			if (token_array[i + 1] != NULL && ms_is_rd_tk(token_array[i + 1]))
 			{
-				write(2, "minishell: syntax error near unexpected token `",
-					48);
+				write(2, "minishell: syntax error near unexpected token `", 48);
 				write(2, token_array[i + 1], ft_strlen(token_array[i + 1]));
 				write(2, "'\n", 2);
 				g_exit = 2;

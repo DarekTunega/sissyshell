@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   parsing_utils2.c                                   :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: skvackov <skvackov@student.42.fr>          +#+  +:+       +#+        */
+/*   By: dtunega <dtunega@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/16 18:29:00 by skvackov          #+#    #+#             */
-/*   Updated: 2025/06/03 22:50:00 by dtunega          ###   ########.fr       */
+/*   Updated: 2025/07/01 15:00:17 by dtunega          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -60,8 +60,9 @@ void	handle_escape_in_quotes(char *word, char *result, int *i, int *j)
 
 void	copy_quoted_content(char *word, char *result, int *i, int *j)
 {
-	char	quote_char = word[*i];
+	char	quote_char;
 
+	quote_char = word[*i];
 	(*i)++;
 	while (word[*i] && word[*i] != quote_char)
 	{
